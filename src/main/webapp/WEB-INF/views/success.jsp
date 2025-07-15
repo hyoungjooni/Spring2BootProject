@@ -8,5 +8,7 @@
 </head>
 <body>
 	<h3>SUCCESS!</h3>
+	<input type="button" class="btn btn-primary" id="listBtn" value="목록" 
+	onclick="javascript:location.href='/crud/free/list'"/>
 </body>
 </html>

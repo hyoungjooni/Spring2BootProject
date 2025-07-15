@@ -26,33 +26,41 @@
 								
 									<table class = "table table-bordered">
 										<tr>
-											<td>제목</td>
-											<td>${board.title }</td>
+											<td>userId</td>
+											<td>${member.userId }</td>
 										</tr>
 										
-									<tr>
-											<td>작성자</td>
-											<td>${board.writer }</td>
-										</tr>
-										
-										<tr>
-											<td>내용</td>
-											<td>${board.content }</td>
+									    <tr>
+											<td>userName</td>
+											<td>${member.userName}</td>
 										</tr>
 										
 										<tr>
-											<td>작성날짜</td>
-											<td>${board.regDate }</td>
+											<td>auth - 1</td>
+											<td>${member.authList[0].auth }</td>
+										</tr>
+										<tr>
+											<td>auth - 2</td>
+											<td>${member.authList[1].auth }</td>
+										</tr>
+										<tr>
+											<td>auth - 3</td>
+											<td>${member.authList[2].auth }</td>
+										</tr>
+										
+									    <tr>
+											<td>등록일</td>
+											<td>${member.regDate}</td>
 										</tr>
 									</table>
 									<br/>
 									<input class="btn btn-warning" type="button" id="btnModify" value="수정" />
 									<input class="btn btn-danger" type="button" id="btnDelete" value="삭제" />
 									<input class="btn btn-primary" type="button" id="btnList" value="목록" 
-									onclick="javascript:location.href='/crud/board/list'"/>
+									onclick="javascript:location.href='/crud/member/list'"/>
 								</div>
-								<form action="/crud/board/remove" method="post" id="delForm">
-									<input type="hidden" name="boardNo" value="${board.boardNo }" />
+								<form action="/crud/member/remove" method="post" id="delForm">
+									<input type="hidden" name="userNo" value="${member.userNo }" />
 								</form>
 							</div>
 						</div>
@@ -71,12 +79,11 @@ $(function(){
 	
 	let btnModify = $("#btnModify");
 	let btnDelete = $("#btnDelete");
-	let btnList = $("#btnList");
 	let delForm = $("#delForm");
 	
 	// 수정 버튼 이벤트 
 	btnModify.on("click", function(){
-		delForm.attr("action", "/crud/board/modify");
+		delForm.attr("action", "/crud/member/modify");
 		delForm.attr("method", "get");
 		delForm.submit();
 	});
@@ -87,18 +94,8 @@ $(function(){
 			delForm.submit();
 		}
 	
-	
 	});
 		
-	
-	
-
-	
-	
-	
-	
-	
-	
 	
 });
 
