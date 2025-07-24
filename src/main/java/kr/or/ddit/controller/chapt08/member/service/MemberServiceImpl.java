@@ -1,9 +1,11 @@
 package kr.or.ddit.controller.chapt08.member.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import kr.or.ddit.controller.chapt08.member.mapper.IMemberMapper;
 import kr.or.ddit.vo.crud.CrudMember;
@@ -17,10 +19,15 @@ public class MemberServiceImpl implements IMemberService {
 	
 	
 	// 회원정보 등록
+//	@Transactional (rollbackFor = {IOException.class, NullPointerException.class})
 	@Override
-	public void register(CrudMember member) {
-		mapper.create(member);
+	public void register(CrudMember member) throws IOException {
+		mapper.create(member);	
 		
+		
+//		if(true) {
+//			throw new NullPointerException(); 
+//		}
 		
 		CrudMemberAuth memberAuth = new CrudMemberAuth();
 		memberAuth.setUserNo(member.getUserNo());	// 회원 등록 후 얻어온 회원번호 설정

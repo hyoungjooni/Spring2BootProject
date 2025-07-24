@@ -1,5 +1,6 @@
 package kr.or.ddit.controller.chapt08.member.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import kr.or.ddit.vo.crud.CrudMember;
@@ -7,7 +8,7 @@ import kr.or.ddit.vo.crud.CrudMember;
 public interface IMemberService {
 
 	// 등록
-	public void register(CrudMember member);
+	public void register(CrudMember member) throws IOException;
 
 	// 목록
 	public List<CrudMember> list();

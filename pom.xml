@@ -122,7 +122,26 @@
 			<version>1.11.0</version>
 		</dependency>
 		
+		<!--이미지 변환을 처리하기 위한 의존 라이브러리-->
+		<dependency>
+			<groupId>org.imgscalr</groupId>
+			<artifactId>imgscalr-lib</artifactId>
+			<version>4.2</version>
+		</dependency>
 		
+		
+		<!--스프링 시큐리티 설정 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-taglibs</artifactId>
+		</dependency>
+		
+		<!--스프링 시큐리티 설정 end -->
 	</dependencies>
 
 	<build>
