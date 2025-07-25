@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.springframework.org/security/tags"  prefix="sec" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,5 +10,19 @@
 <body>
 	<h3>MAIN HOME</h3>
 	<p>THE TIME ON THE SERVER IS ${serverTime }</p>
+	<hr/>
+	
+	
+	<sec:authorize access="isAnonymous()">
+		<a href="/login">로그인</a>
+	</sec:authorize>
+	<sec:authorize access="isAuthenticated()">
+		<a href="/logout">로그아웃</a>
+	</sec:authorize>
+	
+	
+	<h3>MAIN MENU</h3>
+	<a href="/security/board/list">Board List</a><br/>
+	<a href="/security/notice/list">Notice List</a><br/>
 </body>
 </html>

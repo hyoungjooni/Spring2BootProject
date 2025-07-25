@@ -266,7 +266,216 @@ public class Chapter11SecurityController {
 	 	 			  접근 시에 공지사항 게시판 등록 페이지는 관리자 권한만 접근 가능하므로 접근이 거부된다. 
 	 	 			  이떄, access-denied-handler로 설정되어 있는 사용자 정의 클래스의 요청으로 이동하고 해당 페이지에서 
 	 	 			  접근이 거부되었을 때 보여질 페이지로 이동한다.ㄴ
+	 	 		
 	 	 			  
+	 	 7. 사용자 정의 로그인 페이지 
+	 	 
+	 	 	- 기본 로그인 페이지가 아닌 사용자가 직접 정의한 로그인 페이지를 사용한다. 
+	 	 	
+	 	 	# 환경 설정 
+	 	 	
+	 	 		- 시큐리티 Config 설정 
+	 	 			> protected SecurityFilterChain filterChain(HttpSecurity http) 
+	 	 			> filterChain 메서드 안에서 .httpBasic() 메서드를 .formLogin()으로 변경
+	 	 			> .formLogin((login) -> login.loginPage("/login")); 
+	 	 			
+	 	 			
+	 	 	# 로그인 페이지 정의 
+	 	 	
+	 	 		- 사용자가 정의한 로그인 컨트롤러 
+	 	 			> chapt11.login.LoginController 메소드 생성 
+	 	 			
+	 	 		- 사용자 정의 로그인 페이지 
+	 	 			> chapt11/loginForm.jsp
+	 	 			
+	 	 			
+	 	 8. 로그인 성공 처리 
+	 	 
+	 	 		- 로그인을 성공한 후에 로그인 이력 로그를 기록하는 등의 동작을 하고 싶은 경우가 있다. 
+	 	 	      이런 경우에 AuthenticationSuccessHandler라는 인터페이스를 구현해서 로그인 성공 처리자로 지정할 수 있다. 
+	 	 	      
+	 	 	    # 환경 설정 
+	 	 	    
+	 	 	    	- 시큐리티 Config 설정 
+	 	 	    		> protected SecurityFilterChain filterChain(HttpSecurity http) 
+	 	 	    		> filterChain 메소드 안에서 .successHandler(new CustomLoginSuccessHandler()); 
+	 	 	    		> .formLogin((login) -> login.loginPage("/login").successHandler());
+	 	 	    		
+	 	 	    # 로그인 성공 처리자 클래스 정의 
+	 	 	    
+	 	 	    	- 로그인 성공 처리자 
+	 	 	    		> AuthenticationSuccessHandler 인터페이스를 직접 구현하여 인증 전에 접근을 시도한 URL로 리다이렉트 한다. 
+	 	 	    		
+	 	 	   	# 화면 설정
+	 	 	   	
+	 	 	   		- 일반 게시판 등록 화면 
+	 	 	   			> 사용자가 정의한 로그인 페이지에서 회원 권한에 해당하는 계정으로 로그인 시, 성공했다면 성공 처리자인 
+	 	 	   			  CustomLoginSuccessHandler 클래스로 넘어가 넘겨받은 파라미터 중 authentication안에 principle로 
+	 	 	   			  User 정보를 받아서 username과 password를 출력한다. 
 	 
+	 
+	 
+	 	  9.  로그아웃 처리 
+	 	  	
+	 	  		- 로그아웃을 위한 URI를 지정하고, 로그아웃 처리 후에 별도의 작업을 하기 위해서 사용자가 직접 구현한 처리자를 등록할 수 있다. 
+	 	  		
+	 	  		# 환경 설정 
+	 	  		
+	 	  			- 시큐리티 Config 설정 
+	 	  				> protected SecurityFilterChain filterChain(HttpSecurity http) 
+	 	  				> filterChain 메소드 안에서 .logout(); 
+	 	  				> .logout(
+	 	  				> 		(logout) -> logout.logoutUrl("/logout")
+	 	  											. invalidateHttpSession(true).deleteCookies("JSESSION_ID") 
+	 	  				>
+	 	  				> );
+	 	  				> 로그아웃을 처리하기 위한 요청 URL을 등록하고 (POST), 로그아웃 시 session 무효화 및 세션과 관련된 쿠키를 삭제한다. 
+	 	  				> 로그아웃을 실행하기 위한 URL은 기본값 "/logout"입니다. 
+	 	  				  CSRF 보호가 활성화된 경우 (기본값) 요청도 POST여야 합니다. 즉 로그아웃을 트리거하려면 기본적으로 POST "/logout"이 
+	 	  				  필요합니다. 그런데 CSRF 보로가 비활성화된 경우 모든 HTTP 메서드가 허용된다.
+	 	  				  CSRF 보호가 비활성화인 경우, GET 방식의 '/logout'으로도 로그아웃 처리가 가능하다. 
+	 	  				  
+	 	  		# 로그아웃 페이지 정의
+
+					- 사용자가 정의한 로그아웃 컨트롤러
+					  	> chapt11.login.LoginController 메소드 생성
+					- 사용자가 정의한 로그아웃 페이지
+					  	> chapt11/logoutForm.jsp
+
+				# 로그아웃 처리
+				
+				- POST 방식의 '/logout'이 실행되면 아래의 내용이 삭제된다.
+				  		> 연결된 세션 초기화(session)
+					    > 인증 토큰 삭제(CSRF Token)
+					    > SecurityContext 삭제
+					    > Remember Me Cookie 정보 삭제(자동 로그인을 위한 쿠키 정보)
+					    > 이후 자동 리다이렉트('/login' 페이지로)
+  
+  
+  
+  
+	 	  10. UserDetailService 재정의 
+	 	  
+	 	  		- 스프링 시큐리티의 UserDetailsService를 구현하여 사용자 상세 정보를 얻어오는 메소드를 재정의한다. 
+	 	  		
+	 	  		# 환경 설정 
+	 	  		
+	 	  			- pom.xml 설정
+	 	  				> 데이터베이스 의존 관계 라이브러리 
+	 	  				> spring-boot-starter-jdbc
+	 	  				> mybatis-spring-boot-starter
+	 	  				> ojdbc11
+	 	  				
+	 	  			- 데이터베이스 준비 
+	 	  				> member, member_auth 테이블 
+	 	  				
+	 	  			- 시큐리티 config 설정
+	 	  				> protected AuthenticationManager authenticationManager() 인증 매니저 등록 
+	 	  				> authenticationManager 안에 AuthenticationProvider 인증 제공자 등록 
+	 	  				> authenticationManager 안에 UserDetailService 사용자 정의 UserDeatilsService 등록 
+	 	  				> authenticationMAnager 안에 PasswordEncoder passwordEncoder() 비밀번호 암호화 등록 
+	 	  				
+	 	  				
+	 	  			- 비밀번호 암호화 설정 
+	 	  				> MemberController 내, init() 메서드 정의 
+	 	  				> init() 메서드를 통해 암호화된 비밀번호 확인 후, DB 설정 
+	 	  				
+	 	  			*** 비밀번호 암호화 처리기 클래스 정의 
+	 	  			- 비밀번호 암호화 처리기 
+	 	  				> 스프링 시큐리티 5버전부터는 기본적으로 PasswordEncoder를 지정해야 하는데, 재대로 하려면 생성된 테이블(member)에 
+	 	  				  비밀번호를 암호화하여 지정해야 한다. 암호화를 지정하기 위해서는 SHA-2방식의 8바이트 Hash 암호를 생성하는 
+	 	  				  BCryptPasswordEncoder를 이용하여 암호화 설정을 진행한다. 
+	 	  				  
+	 	  			*** BCryptPasswordEncoder 클래스를 활용한 단방향 비밀번호 암호화 
+	 	  			- encode() 메서드를 통해서 SHA-2 방식의 8바이트 Hash 암호를 매번 랜덤하게 생성한다. 
+	 	  			- 똑같은 비밀번호를 입력하더라도 암호화되는 문자열은 매번 다른 문자열을 반환한다. 
+	 	  			- 비밀번호를 입력하면 암호화된 비밀번호로 인코딩하는데, 암호화된 비밀번호와 테이블에 있는 암호화된 비밀번호가 일치한지를 파악 후, 
+	 	  			  일치하면 로그인 성공으로 다음 스탭을 진행 
+	 	  			- BCryptPasswordEncoder 클래스의 encode() 메소드를 통해 만들어지는 암호화는 Hash 다이제스트들은 입력한 비밀번호 문자에 
+	 	  			  해당하는 수십억개의 다이제스트들 중에서 일치하는 다이제스트가 존재할 경우 비밀번호의 일치로 보고 인증을 성공시켜준다.
+	 
+	 	  				
+	 	  11. 스프링 시큐리티 표현식 
+	 	  
+	 	  		- 스프링 시큐리티 표현식을 이용하면 인증 및 권한 정보에 따라 화면을 동적으로 구성할 수 있고 로그인 한 사용자 정보를 보여줄 수도 있다. 
+	 	  		
+	 	  		# 공동 표현식 
+	 	  		
+	 	  			- hasRole([role]) : 해당 롤이 있으면 true
+	 	  			- hasAnyRole([role1, role2]) : 여러롤들 중에서 하나라도 해당하는 롤이 있으면 true
+	 	  			- principal : 인증된 사용자의 정보(UserDetails 인터페이스를 구현한 클래스의 객체)를 의미 
+	 	  			- authentication : 인증 사용자의 인증 정보(Authentication 인터페이스를 구현한 클래스의 객체)를 의미 
+	 	  			- permitAll : 모든 사용자에게 거부 
+	 	  			- denyAll : 모든 사용자에게 거부 
+	 	  			- isAnonymous() : 익명의 사용자의 경우 (로그인을 하지 않은 경우도 해당) 
+	 	  			- isAuthenticated() : 인증된 사용자면 true
+	 	  			- isFullyAuthenticated() : Remember-me로 인증된 것이 아닌 일반적인 방법으로 인증된 사용자인 경우 true
+	 	  			
+	 	  			
+	 	  			
+	 	  		표현식 사용 
+	 	  		
+	 	  			-  표현식 을 이용하여 동적 화면 구성
+	 	  				> home.jsp 수정 
+	 	  		
+	 	  			- 로그인 한 사용자 정보 보여주기 
+	 	  				> board/register.jsp 수정 
+	 	  				> notice/register.jsp 수정 
+	 	  				
+	 	  			-  표현식 사용해보기 
+	 	  				> <sec:authentication property=""> 
+	 	  				> <sec:authorize access="">
+	 	  				
+	 	  				
+	 	  12. 자동 로그인 
+	 	  				
+	 	  		- 로그인하면 특정 시간 동안 다시 로그인 할 필요가 없는 기능이다. 
+	 	  		- 스프링 시큐리티는 메모리나 데이터베이스를 사용하여 처리한다. 
+	 	  		
+	 	  		
+	 	  		# 환경 설정 
+	 	  		
+	 	  			- 데이터베이스 준비 
+	 	  				> persistent_logins 테이블 
+	 	  				
+	 	  			- 로그인 페이지 수정 
+	 	  				> loginForm.jsp 수정 
+	 	  				> remember-me 체크박스 추가 
+	 	  				
+	 	  			- 시큐리티 Config 설정 
+	 	  				> protected PersistentTokenRepository persistentTokenRepository() 등록 
+	 	  				> protected SecurityFilterChain filterChain(HttpSecurity http) 
+	 	  				> filterChain 메소드 안에서 .rememberMe()
+	 	  				> .rememberMe(
+	 	  						(config) ->  config.tokenValiditySeconds(86400)
+	 	  											.tokenRepository(persistentTokenRepository()));
+	 	  				> .deleteCookies("remeber-me") 추가 
+	 	  				
+	 	  				
+	 	  				
+	 	  13. 스프링 시큐리티 어노테이션 
+	 	  
+	 	  		- 스프링 시큐리티는 어노테이션을 사용하여 필요한 설정을 추가할 수 있다. 
+	 	  			> @Secured : 스프링 시큐리티 모듈을 지원하기 위한 어노테이션으로 초기부터 사용되었다. 
+	 	  			> @PreAuthorize : 메소드가 실행되기 전에 적용할 접근 정책을 지정할 때 사용한다. 
+	 	  			> @PostAuthorize : 메소드가 실행한 후에 적용할 접근 정책을 지정할 때 사용한다. 
+	 	  			
+	 	  	
+	 	  		# 환경 설정 
+	 	  			
+	 	  			- 시큐리티 Config 설정
+						  > SecurityConfig 클래스에 @EnableMethodSecurity 어노테이션 추가
+						  > protected SecurityFilterChain filterChain(HttpSecurity http)
+						  > .authorizeHttpRequests() 부분 주석
+
+					- 어노테이션 적용
+						  > BoardController 클래스의 register() 메소드에 @PreAuthorize 어노테이션 설정
+						  > NoticeController 클래스의 register() 메소드에 @PreAuthorize 어노테이션 설정
+		 	  				
+	 	  				
+	 	  				
+	 	  				
+	 	  				
+	 	  				
 	*/
 }
