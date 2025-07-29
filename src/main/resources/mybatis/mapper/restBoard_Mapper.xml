@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.controller.chapt12.mapper.IRestMapper">
+
+
+
+	<resultMap type="kr.or.ddit.vo.rest.RestBoardVO" id="restBoardMap">
+		<id property="boNo" column="bo_no" />
+		<result property="boNo" column="bo_no"/>
+		<result property="boTitle" column="bo_title"/>
+		<result property="boWriter" column="bo_writer"/>
+		<result property="boContent" column="bo_content"/>
+		<result property="boDate" column="bo_date"/>
+		<result property="boHit" column="bo_hit"/>
+		<collection property="boardFileList" resultMap="restBoardFileMap" />
+	
+	</resultMap>
+	
+	<resultMap type="kr.or.ddit.vo.rest.RestBoardFileVO" id="restBoardFileMap">
+		<id property="fileNo" column="file_no" />
+		<result property="fileName" column="file_name"/>
+		<result property="fileSize" column="file_size"/>
+		<result property="fileFancysize" column="file_fancysize"/>
+		<result property="fileMime" column="file_mime"/>
+		<result property="fileSavepath" column="file_savepath"/>
+		<result property="fileDowncount" column="file_downcount"/>
+	</resultMap>
+
+
+
+
+
+	<insert id="insertBoard" parameterType="kr.or.ddit.vo.rest.RestBoardVO">
+		<selectKey keyProperty="boNo" resultType="int" order="BEFORE">
+			select seq_restboard.nextval from dual
+		</selectKey>
+		insert into restboard(
+			bo_no, bo_title, bo_content, bo_writer, bo_date, bo_hit
+		)values(
+			#{boNo}, #{boTitle}, #{boContent}, #{boWriter}, sysdate, 0
+		)
+		
+	
+	</insert>
+
+
+	<insert id="insertBoardFile" parameterType="kr.or.ddit.vo.rest.RestBoardFileVO">
+		insert into restboardfile(
+			file_no, bo_no, file_name, file_size, file_fancysize, file_mime, file_savepath, file_downcount
+		)values(
+			seq_restboardfile.nextval, #{boNo}, #{fileName}, #{fileSize}, #{fileFancysize}, #{fileMime}, #{fileSavepath}, 0
+		)
+	
+	</insert>
+	
+	<select id="selectBoard" parameterType="int" resultMap="restBoardMap">
+		select 
+			r.bo_no, bo_title, bo_content, bo_writer, bo_date, bo_hit, 
+			file_no, file_name, file_size, file_fancysize, file_mime, file_savepath, file_downcount
+		from restboard r left outer join restboardfile rf on(r.bo_no = rf.bo_no)
+	where r.bo_no = #{boNo}
+	</select>
+	
+	
+	
+	<select id="getFileInfo" parameterType="int" resultType="kr.or.ddit.vo.rest.RestBoardFileVO">
+		select
+			file_no, bo_no, file_name, file_size, file_fancysize, file_mime, file_savepath, file_downcount
+		from restboardfile
+		where file_no = #{fileNo}
+	</select>
+	
+	
+	<update id="updateBoard" parameterType="kr.or.ddit.vo.rest.RestBoardVO">
+		update restboard
+		set
+			bo_title = #{boTitle},
+			bo_content = #{boContent}, 
+			bo_date = sysdate
+		where bo_no = #{boNo}
+	
+	</update>
+	
+	
+	<select id="selectBoardFile" parameterType="int" resultType="kr.or.ddit.vo.rest.RestBoardFileVO">
+		select 
+			file_no, bo_no, file_name, file_savepath
+		from restboardfile
+		where file_no = #{fileNo}
+	</select>
+	
+	
+	<delete id="deleteBoardFile" parameterType="int">
+		delete from restboardfile
+		where file_no = #{fileNo}
+	</delete>
+	
+	
+	
+	<delete id="deleteBoardFileByBoNo" parameterType="int">
+		delete from restboardfile
+		where bo_no = #{boNo}
+	
+	</delete>
+	
+	<delete id="deleteBoard" parameterType="int">
+		delete from restboard
+		where bo_no = #{boNo}
+	
+	</delete>
+
+		
+	<select id="list" resultType="kr.or.ddit.vo.rest.RestBoardVO">
+		select
+			r.bo_no, bo_title, bo_content, bo_writer, bo_date, bo_hit,
+			(select count(*) from restboardfile rbf where rbf.bo_no = r.bo_no) as cnt
+		from restboard r
+		order by bo_no desc
+	
+	</select>
+	
+	
+	
+	
+
+</mapper>

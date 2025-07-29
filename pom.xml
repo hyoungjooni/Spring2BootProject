@@ -110,6 +110,13 @@
 			<version>1.4</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.6</version>
+		</dependency>
+		
+		
 		<!--
 			p6spy 
 			- 데이터베이스 쿼리 로깅 및 모니터링을 위한 라이브러리 
@@ -142,6 +149,31 @@
 		</dependency>
 		
 		<!--스프링 시큐리티 설정 end -->
+		
+		<!-- JWU 의존 라이브러리 -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.9.1</version>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>0.12.3</version>
+		</dependency>
+		<!--XML 문서와 java객체 간 매핑 자동화-->
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+		<!-- application.properties의 설정된 속성 정보를 가져오기 위한 의존 라이브러리  -->		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+		</dependency>
+		
+		<!-- JWT 의존 라이브러리 end -->
 	</dependencies>
 
 	<build>

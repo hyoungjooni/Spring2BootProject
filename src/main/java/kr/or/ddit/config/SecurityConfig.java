@@ -1,9 +1,10 @@
-package kr.or.ddit.controller.chapt11;
+package kr.or.ddit.config;
 
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.BadSqlGrammarException;
@@ -25,6 +26,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
+import jakarta.servlet.DispatcherType;
 import kr.or.ddit.controller.chapt06.Chapter06RedirectAttributeController;
 import kr.or.ddit.security.CustomAccessDeniedHandler;
 import kr.or.ddit.security.CustomLoginFailureHandler;
@@ -42,12 +44,6 @@ import lombok.extern.slf4j.Slf4j;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-
-    private final Chapter06RedirectAttributeController chapter06RedirectAttributeController;
-
-    SecurityConfig(Chapter06RedirectAttributeController chapter06RedirectAttributeController) {
-        this.chapter06RedirectAttributeController = chapter06RedirectAttributeController;
-    }
 
 		/*
 		 	Spring Security 6.1.0 이후부터 람다식의 형태로 바뀌면서 deprecated된 메서드가 상당히 많아짐 
@@ -80,26 +76,27 @@ public class SecurityConfig {
 	protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		// # CSRF 설정 
 		// CSRF 공격에 방어하기 위한 방안으로 csrf를 설정하는데 REST에서는 csrf를 disable 설정이 기본 설정 
-		// http.csrf((csrf) -> csrf.disable());
+		 http.csrf((csrf) -> csrf.disable());
 	
-//		http.authorizeHttpRequests(
-//				(authorize) -> 
-//						// forward는 모두 접근 가능 
-//						authorize.dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ASYNC).permitAll()
-//						// 서버쪽에서 정적 자원을 관리한다면 static 하위 정적 파일들을 permitAll로 설정한다.
-//						.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-//						.requestMatchers("/resources/**").permitAll()
-//						// 시큐리티 일반게시판 목록, 시큐리티 공지사항 게시판 목록 모두 접근 가능 
-//						.requestMatchers("/security/board/list", "/security/notice/list").permitAll()
-//						// 시큐리티 일반 게시판 등록은 회원과 관리자만 접근 가능 
-//						// 'ROLE_'를 제외한 권한명을 설정한다. 
-//						.requestMatchers("/security/board/register").hasAnyRole("MEMBER", "ADMIN")
-//						// 시큐리티 공지사항 게시판 등록은 관리자만 접근 가능
-//						.requestMatchers("/security/notice/register").hasRole("ADMIN")
-//						.requestMatchers("/").permitAll()
-//						// 다른 요청은 인증된 사용자가 아닌 모든 사용자 접근 가능 
-//						.anyRequest().authenticated()
-//		);
+		http.authorizeHttpRequests(
+				(authorize) -> 
+						// forward는 모두 접근 가능 
+						authorize.dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ASYNC).permitAll()
+						// 서버쪽에서 정적 자원을 관리한다면 static 하위 정적 파일들을 permitAll로 설정한다.
+						.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+						.requestMatchers("/resources/**").permitAll()
+						// 시큐리티 일반게시판 목록, 시큐리티 공지사항 게시판 목록 모두 접근 가능 
+						.requestMatchers("/security/board/list", "/security/notice/list").permitAll()
+						// 시큐리티 일반 게시판 등록은 회원과 관리자만 접근 가능 
+						// 'ROLE_'를 제외한 권한명을 설정한다. 
+						.requestMatchers("/security/board/register").hasAnyRole("MEMBER", "ADMIN")
+						// 시큐리티 공지사항 게시판 등록은 관리자만 접근 가능
+						.requestMatchers("/security/notice/register").hasRole("ADMIN")
+						.requestMatchers("/").permitAll()
+						.requestMatchers("/jwt/**").permitAll()
+						// 다른 요청은 인증된 사용자가 아닌 모든 사용자 접근 가능 
+						.anyRequest().authenticated()
+		);
 		
 		
 		// 로그인 인증 방식은 "BASIC"에 해당하는 기본 인증 방식으로 요청 
